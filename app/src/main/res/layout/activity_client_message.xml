@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <variable
+      name="viewmodel"
+      type="org.markensic.emqx.viewmodels.MessageViewModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="10dp"
+    android:paddingTop="26dp"
+    tools:context="org.markensic.emqx.client.ui.ClientConnectActivity">
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/app_name"
+      android:textSize="30sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+      android:id="@+id/group_left"
+      android:layout_width="145dp"
+      android:layout_height="0dp"
+      android:layout_marginTop="10dp"
+      android:layout_marginBottom="10dp"
+      android:background="@drawable/gray_board"
+      android:orientation="vertical"
+      android:textSize="16sp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/title">
+
+      <TextView
+        android:id="@+id/add"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:drawableEnd="@drawable/ic_list"
+        android:gravity="center"
+        android:text="@string/add_subject"
+        android:textSize="16sp" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+      <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+          android:id="@+id/subject_group"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:orientation="vertical"
+          android:paddingLeft="5dp" />
+
+      </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:background="@drawable/gray_board"
+      app:layout_constraintBottom_toBottomOf="@+id/group_left"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@+id/group_left"
+      app:layout_constraintTop_toTopOf="@+id/group_left">
+
+      <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/message_topic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+          android:id="@+id/message_group"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:orientation="vertical"
+          android:paddingLeft="5dp"
+          android:paddingEnd="5dp" />
+
+      </androidx.core.widget.NestedScrollView>
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/message_qos" />
+
+      <org.markensic.emqx.client.widget.MaterialEditText
+        android:id="@+id/message_topic"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:hint="@string/mqtt_message_topic"
+        android:paddingLeft="5dp"
+        android:paddingTop="0dp"
+        android:singleLine="true"
+        android:text="@={viewmodel.publishTopic}"
+        android:textColor="@color/gray"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@+id/message"
+        app:layout_constraintEnd_toStartOf="@+id/message_qos"
+        app:layout_constraintStart_toStartOf="parent" />
+
+      <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@color/gray"
+        app:layout_constraintBottom_toBottomOf="@+id/message_topic"
+        app:layout_constraintStart_toEndOf="@+id/message_topic"
+        app:layout_constraintTop_toTopOf="@+id/message_topic" />
+
+      <org.markensic.emqx.client.widget.MaterialEditText
+        android:id="@+id/message_qos"
+        android:layout_width="50dp"
+        android:layout_height="0dp"
+        android:background="@null"
+        android:hint="@string/mqtt_qos"
+        android:inputType="number"
+        android:paddingLeft="5dp"
+        android:paddingTop="0dp"
+        android:singleLine="true"
+        android:text="@={viewmodel.publishQos}"
+        android:textColor="@color/gray"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@+id/message_topic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/message_topic"
+        app:layout_constraintTop_toTopOf="@+id/message_topic" />
+
+      <EditText
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="@drawable/gray_board"
+        android:gravity="start|top"
+        android:padding="2.5dp"
+        android:text="@={viewmodel.publishMessage}"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/send"
+        app:layout_constraintStart_toStartOf="parent" />
+
+      <Button
+        android:id="@+id/send"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_marginEnd="2.5dp"
+        android:layout_marginBottom="2.5dp"
+        android:includeFontPadding="false"
+        android:text="@string/send"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+      <CheckBox
+        android:id="@+id/retain"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:checked="@={viewmodel.publishRetain}"
+        android:text="@string/mqtt_retain"
+        android:textColor="@color/gray"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@+id/send"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/send" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

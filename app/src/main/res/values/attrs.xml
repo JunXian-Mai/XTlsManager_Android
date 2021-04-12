@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="MaterialEditText">
+    <attr name="enableFloatLabel" format="boolean" />
+    <attr name="floatLabelText" format="string" />
+    <attr name="floatLabelSize" format="dimension" />
+    <attr name="floatLabelColor" format="color" />
+  </declare-styleable>
+
+  <declare-styleable name="SwitchButton">
+    <attr name="checkColor" format="color" />
+    <attr name="unCheckColor" format="color" />
+    <attr name="checkTint" format="color" />
+    <attr name="checkCircleColor" format="color" />
+    <attr name="unCheckCircleColor" format="color" />
+    <attr name="checkCircleTint" format="color" />
+  </declare-styleable>
+</resources>

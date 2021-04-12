@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+  xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <data>
+
+    <variable
+      name="viewmodel"
+      type="org.markensic.emqx.viewmodels.AddSubjectTopicViewModel" />
+  </data>
+
+  <LinearLayout
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/add_subject"
+      android:textColor="@color/black"
+      android:textSize="20sp" />
+
+    <org.markensic.emqx.client.widget.MaterialEditText
+      android:id="@+id/subject_topic"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="@string/mqtt_subject_topic"
+      android:text="@={viewmodel.subjectTopic}" />
+
+    <org.markensic.emqx.client.widget.MaterialEditText
+      android:id="@+id/qos"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="@string/mqtt_qos"
+      android:inputType="number"
+      android:text="@={viewmodel.qos}" />
+
+    <Button
+      android:id="@+id/confirm"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="5dp"
+      android:background="@drawable/gray_board"
+      android:text="@string/confirm"
+      android:textSize="18sp" />
+
+  </LinearLayout>
+
+</layout>

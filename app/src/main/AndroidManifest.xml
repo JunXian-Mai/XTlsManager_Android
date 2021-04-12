@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  package="org.markensic.emqx">
+
+  <!--  系统定位权限  -->
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+  <!--  网络相关权限请求  -->
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+  <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+  <!--  系统信息权限请求  -->
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.READ_LOGS" />
+
+  <!--  系统存储权限  -->
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+  <!--  系统安装权限  -->
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+  <application
+    android:name="org.markensic.emqx.base.EmqxApp"
+    android:theme="@style/FullScreenAppTheme"
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:largeHeap="true"
+    android:maxAspectRatio="2.4"
+    android:networkSecurityConfig="@xml/network_security_config"
+    android:resizeableActivity="true"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true">
+
+<!--    <activity-->
+<!--      android:name=".client.ui.ClientConnectActivity"-->
+<!--      android:screenOrientation="portrait">-->
+<!--      <intent-filter>-->
+<!--        <action android:name="android.intent.action.MAIN" />-->
+
+<!--        <category android:name="android.intent.category.LAUNCHER" />-->
+<!--      </intent-filter>-->
+<!--    </activity>-->
+
+    <activity
+      android:name="org.markensic.emqx.client.ui.ClientMessageActivity"
+      android:screenOrientation="portrait" />
+
+    <activity
+      android:name="org.markensic.emqx.test.TestCertManagerActivity"
+      android:screenOrientation="portrait">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <meta-data
+      android:name="android.max_aspect"
+      android:value="2.4" />
+
+    <meta-data
+      android:name="android.notch_support"
+      android:value="true" />
+
+    <meta-data
+      android:name="notch.config"
+      android:value="portrait|landscape" />
+
+    <meta-data
+      android:name="PGYER_API_KEY"
+      android:value="0e8276a03aac594f7db6270c1e63e9fa" />
+
+    <meta-data
+      android:name="PGYER_FRONTJS_KEY"
+      android:value="c84a5d6fd4e0d8d20237a46e36bfbe43" />
+
+    <meta-data
+      android:name="PGYER_FEATURE_CHECK_UNPDATE"
+      android:value="false" />
+  </application>
+
+</manifest>

@@ -1,0 +1,28 @@
+<resources>
+  <string name="app_name">EmqAX</string>
+  <string name="mqtt_name">名称</string>
+  <string name="mqtt_client_id">Client ID</string>
+  <string name="mqtt_user">用户名</string>
+  <string name="mqtt_password">密码</string>
+  <string name="mqtt_keep_alive">Keep Alive</string>
+  <string name="mqtt_user_hint">用户名（选填）</string>
+  <string name="mqtt_password_hint">密码（选填）</string>
+  <string name="mqtt_keep_alive_hint">Keep Alive（秒）</string>
+  <string name="mqtt_clean_session">清除会话</string>
+  <string name="mqtt_address">服务器地址</string>
+  <string name="mqtt_enable_tls">启用 TLS/SSL</string>
+  <string name="one_way_certification">单向验证</string>
+  <string name="two_way_certification">双向验证</string>
+  <string name="mqtt_ca">CA 文件</string>
+  <string name="mqtt_client_pem">客户端证书</string>
+  <string name="mqtt_client_key">客户端 Key</string>
+  <string name="connect">连接</string>
+  <string name="mqtt_subject_topic">订阅主题</string>
+  <string name="mqtt_publish_topic">发布主题</string>
+  <string name="mqtt_message_topic">消息主题</string>
+  <string name="mqtt_qos">Qos</string>
+  <string name="send">发送</string>
+  <string name="add_subject">添加订阅</string>
+  <string name="confirm">确定</string>
+  <string name="mqtt_retain">Retain</string>
+</resources>
