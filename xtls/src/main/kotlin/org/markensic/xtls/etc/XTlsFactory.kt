@@ -1,11 +1,9 @@
 package org.markensic.xtls.etc
 
-import android.os.Build
 import android.util.Base64
 import com.markensic.sdk.utils.AssetsUtils
 import org.markensic.xtls.constant.Constant
 import org.markensic.xtls.impl.XTls509CertSet
-import org.markensic.xtls.manager.XTls509ExtendedTrustManager
 import org.markensic.xtls.manager.XTls509TrustManager
 import org.markensic.xtls.manager.XTlsHostVerifier
 import java.io.BufferedReader
@@ -36,21 +34,14 @@ object XTlsFactory {
    * @param attachSystemCerts 是否添加系统证书
    * @return 证书管理器
    */
-  fun creatDefaultManager(certSet: XTls509CertSet, attachSystemCerts: Boolean = true): X509TrustManager {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      XTls509ExtendedTrustManager(
-        getCaCertificates(certSet.getCaCertPaths()),
-        XTlsHostVerifier(certSet),
-        attachSystemCerts
-      )
-    } else {
-      XTls509TrustManager(
-        getCaCertificates(certSet.getCaCertPaths()),
-        XTlsHostVerifier(certSet),
-        attachSystemCerts
-      )
-    }
-  }
+  fun creatDefaultManager(
+    certSet: XTls509CertSet,
+    attachSystemCerts: Boolean = true
+  ) = XTls509TrustManager(
+    getCaCertificates(certSet.getCaCertPaths()),
+    XTlsHostVerifier(certSet),
+    attachSystemCerts
+  )
 
 
   /**
@@ -65,21 +56,11 @@ object XTlsFactory {
     trustedSelfCerts: Array<X509Certificate>,
     verifier: XTlsHostVerifier,
     attachSystemCerts: Boolean = true
-  ): X509TrustManager {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      XTls509ExtendedTrustManager(
-        trustedSelfCerts,
-        verifier,
-        attachSystemCerts
-      )
-    } else {
-      XTls509TrustManager(
-        trustedSelfCerts,
-        verifier,
-        attachSystemCerts
-      )
-    }
-  }
+  ) = XTls509TrustManager(
+    trustedSelfCerts,
+    verifier,
+    attachSystemCerts
+  )
 
   /**
    * 获取Android System 中默认的证书信任库，信任的根证列表

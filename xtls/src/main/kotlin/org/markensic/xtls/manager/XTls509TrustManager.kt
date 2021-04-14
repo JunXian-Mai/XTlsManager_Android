@@ -1,5 +1,7 @@
 package org.markensic.xtls.manager
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import org.markensic.xtls.etc.XTlsFactory
 import com.markensic.sdk.global.sdkLogd
 import com.markensic.sdk.global.sdkLoge
@@ -13,7 +15,7 @@ class XTls509TrustManager internal constructor(
   private val trustedSelfCerts: Array<X509Certificate>,
   private val verifier: XTlsHostVerifier,
   private val attachSystemCerts: Boolean = true
-) : X509TrustManager {
+) : X509ExtendedTrustManager() {
 
   // [DEBUG]是否输出证书详细信息
   private val outputCertDetail = false
@@ -39,11 +41,27 @@ class XTls509TrustManager internal constructor(
   }
 
   override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-    checkTrusted(chain, authType, true)
+    checkTrusted(chain, authType, null as Socket?, true)
   }
 
   override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-    checkTrusted(chain, authType, false)
+    checkTrusted(chain, authType, null as Socket?, false)
+  }
+
+  override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?, socket: Socket) {
+    checkTrusted(chain, authType, socket, true)
+  }
+
+  override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?, socket: Socket) {
+    checkTrusted(chain, authType, socket, false)
+  }
+
+  override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?, engine: SSLEngine) {
+    checkTrusted(chain, authType, engine, true)
+  }
+
+  override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?, engine: SSLEngine) {
+    checkTrusted(chain, authType, engine, false)
   }
 
   override fun getAcceptedIssuers(): Array<X509Certificate> {
@@ -65,11 +83,46 @@ class XTls509TrustManager internal constructor(
   @Throws(CertificateException::class)
   private fun checkTrusted(
     chain: Array<out X509Certificate>?,
-    authType: String?,
+    authType: String?, socket: Socket?,
     checkClientTrusted: Boolean
   ) {
     // 校验服务器证书连，类型是否非NULL
     checkTrustedInit(chain, authType)
+
+    // 判断是否是SSL,并获取SSLSession
+    if (socket is SSLSocket && socket.isConnected()) {
+      val session = socket.handshakeSession
+      // 域名校验
+      checkHostname(chain!!, session, checkClientTrusted)
+    }
+
+    // 证书校验
+    checkCerts(chain!!, authType!!, checkClientTrusted)
+  }
+
+  /**
+   * 证书校验
+   * @param chain 服务器证书链
+   * @param authType 授权类型
+   * @param engine 连接engine
+   * @param checkClientTrusted 服务端否是校验客户端
+   * @throws CertificateException
+   */
+  @Throws(CertificateException::class)
+  private fun checkTrusted(
+    chain: Array<out X509Certificate>?,
+    authType: String?, engine: SSLEngine?,
+    checkClientTrusted: Boolean
+  ) {
+    // 校验服务器证书连，类型是否非NULL
+    checkTrustedInit(chain, authType)
+
+    // 判断engine是否非NUll,并获取SSLSession
+    if (engine != null) {
+      val session = engine.handshakeSession ?: throw CertificateException("No handshake session")
+      // 域名校验
+      checkHostname(chain!!, session, checkClientTrusted)
+    }
 
     // 证书校验
     checkCerts(chain!!, authType!!, checkClientTrusted)
@@ -87,6 +140,45 @@ class XTls509TrustManager internal constructor(
   ) {
     require(chain?.isNotEmpty() == true) { "null or zero-length certificate chain" }
     require(authType?.isNotBlank() == true) { "null or zero-length authentication type" }
+  }
+
+  /**
+   * 域名校验
+   * @param chain 证书链
+   * @param session 会话
+   * @param checkClientTrusted 是否校验客户端信任
+   * @throws CertificateException 校验失败，报错
+   */
+  @Throws(CertificateException::class)
+  private fun checkHostname(
+    chain: Array<out X509Certificate>,
+    session: SSLSession,
+    checkClientTrusted: Boolean
+  ) {
+    // 获取访问host
+    val peerHost = session.peerHost
+    if (!checkClientTrusted) {
+      // 获取访问host
+      val sniNames = getRequestedServerNames(session)
+      // 获取 SNI 域名（同主机多域名，多证书情况）
+      val sniHostName = getHostNameInSNI(sniNames)
+      // 存在 SNI 域名则判断 SNI 域名
+      if (sniHostName?.isNotEmpty() == true) {
+        // 使用域名校验器校验证书[目标证书：直接访问的证书，即chain[0]]
+        if (!verifier.verify(sniHostName, chain[0])) {
+          // 访问host是否匹配证书
+          if (sniHostName == peerHost || !verifier.verify(peerHost!!, chain[0])) {
+            // SNI 与 访问host 都不匹配，直接结束
+            throw CertificateException("No subject alternative names present")
+          }
+        }
+      } else if (peerHost != null) {
+        // 不存在多域名，直接判断host
+        if (!verifier.verify(peerHost, chain[0])) {
+          throw CertificateException("No subject alternative names present")
+        }
+      }
+    }
   }
 
   /**
@@ -142,6 +234,36 @@ class XTls509TrustManager internal constructor(
     }
     // 不被自定义证书信任
     return false
+  }
+
+  // 获取 SNI
+  private fun getRequestedServerNames(session: SSLSession): List<SNIServerName>? {
+    return if (session is ExtendedSSLSession) {
+      session.requestedServerNames
+    } else emptyList()
+  }
+
+  // 获取 SNI 域名
+  private fun getHostNameInSNI(sniNames: List<SNIServerName>?): String? {
+    var hostname: SNIHostName? = null
+    sniNames?.forEach {
+      if (it.type == StandardConstants.SNI_HOST_NAME) {
+        if (it is SNIHostName) {
+          hostname = it
+        } else {
+          try {
+            hostname = SNIHostName(it.encoded)
+          } catch (iae: IllegalArgumentException) {
+            iae.printStackTrace()
+            println("Illegal server name: $it")
+          }
+        }
+        return@forEach
+      }
+    }
+
+    // 转换 SNI 域名
+    return hostname?.asciiName
   }
 
   private fun showTrustedCerts() {
