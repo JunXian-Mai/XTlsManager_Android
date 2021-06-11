@@ -2,7 +2,7 @@ package org.markensic.emqx.client.mqtt
 
 import org.markensic.emqx.base.plugin.putSubject
 import org.markensic.emqx.base.plugin.removeSubject
-import org.markensic.xtls.manager.XTlsHostVerifier
+import org.markensic.xtls.hostname.XTlsHostVerifier
 import org.markensic.emqx.models.TopicBean
 import com.markensic.sdk.global.sdkLogd
 import com.markensic.sdk.global.sdkLoge
@@ -11,7 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.eclipse.paho.client.mqttv3.*
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
-import org.markensic.emqx.cert.impl.XTls509CertSetImpl
+import org.markensic.emqx.cert.impl.XTlsHostnameConfigImpl
 import javax.net.ssl.SSLSocketFactory
 
 class Client(
@@ -45,7 +45,7 @@ class Client(
   fun setSSLSocketFactory(sslSocketFactory: SSLSocketFactory) =
     this.apply {
       connOpts.socketFactory = sslSocketFactory
-      connOpts.sslHostnameVerifier = XTlsHostVerifier(XTls509CertSetImpl)
+      connOpts.sslHostnameVerifier = XTlsHostVerifier(XTlsHostnameConfigImpl)
     }
 
   fun setCallBack(callback: PushCallBack) =

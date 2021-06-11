@@ -1,6 +1,5 @@
-package org.markensic.xtls.manager
+package org.markensic.xtls.hostname
 
-import org.markensic.xtls.impl.XTls509CertSet
 import java.security.cert.X509Certificate
 import java.util.*
 import java.util.regex.Pattern
@@ -8,7 +7,7 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLPeerUnverifiedException
 import javax.net.ssl.SSLSession
 
-open class XTlsHostVerifier(private val certSet: XTls509CertSet) : HostnameVerifier {
+open class XTlsHostVerifier(private val config: XTlsHostnameConfig) : HostnameVerifier {
   private val ALT_DNS_NAME = 2
   private val ALT_IPA_NAME = 7
 
@@ -153,15 +152,15 @@ open class XTlsHostVerifier(private val certSet: XTls509CertSet) : HostnameVerif
    * 获取域名校验IP过滤列表
    */
   fun getIgnoreIpList(): Array<String> {
-    return certSet.getIgnoreTargetIPVerifierList()
-      .plus(certSet.getIgnoreAccessIPVerifierList())
+    return config.getIgnoreTargetIPVerifierList()
+      .plus(config.getIgnoreAccessIPVerifierList())
   }
 
   /**
    * 获取域名校验Host过滤列表
    */
   fun getIgnoreHostList(): Array<String> {
-    return certSet.getIgnoreTargetHostVerifierList()
-      .plus(certSet.getIgnoreAccessHostVerifierList())
+    return config.getIgnoreTargetHostVerifierList()
+      .plus(config.getIgnoreAccessHostVerifierList())
   }
 }

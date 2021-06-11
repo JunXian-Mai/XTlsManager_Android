@@ -9,13 +9,14 @@ import org.markensic.emqx.base.constant.CodeConstant
 import org.markensic.emqx.base.plugin.getRandomString
 import org.markensic.emqx.models.ConnectBean
 import com.markensic.sdk.utils.FileUtils
-import org.markensic.emqx.cert.impl.XTls509CertSetImpl
+import org.markensic.emqx.cert.impl.XTlsHostnameConfigImpl
+import org.markensic.xtls.constant.ASSETS_PRE
 
 class ConnectViewModel : ViewModel() {
 
   val name = MutableLiveData("android_${getRandomString(6)}")
   val clientId = MutableLiveData("android_${getRandomString(6)}")
-  val address = MutableLiveData("ssl://192.168.43.204:8883")
+  val address = MutableLiveData("ssl://192.168.36.4:8883")
   val user = MutableLiveData("")
   val password = MutableLiveData("")
   val keepAlive = MutableLiveData("60")
@@ -24,9 +25,9 @@ class ConnectViewModel : ViewModel() {
   val oneWayCertification = MutableLiveData(false)
   val twoWayCertification = MutableLiveData(true)
 
-  private val defaultCA = "${XTls509CertSetImpl.getCaCertPaths()[0]}"
-  private val defaultPem = "${XTls509CertSetImpl.getClientKeyCertPathPairs()[0].cert}"
-  private val defaultKey = "${XTls509CertSetImpl.getClientKeyCertPathPairs()[0].key}"
+  private val defaultCA = "${ASSETS_PRE}certs/testssl/all-ca-my.crt"
+  private val defaultPem = "${ASSETS_PRE}certs/testssl/clientmy.crt"
+  private val defaultKey = "${ASSETS_PRE}certs/testssl/client-key.pem"
 
   val ca = MutableLiveData(defaultCA)
   val clientPem = MutableLiveData(defaultPem)

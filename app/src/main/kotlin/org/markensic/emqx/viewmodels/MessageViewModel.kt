@@ -12,15 +12,16 @@ import com.markensic.sdk.ui.dp
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.markensic.emqx.R
 import org.markensic.emqx.base.plugin.getSubject
-import org.markensic.emqx.cert.impl.XTls509CertSetImpl
+import org.markensic.emqx.cert.impl.XTlsHostnameConfigImpl
 import org.markensic.emqx.client.mqtt.Client
 import org.markensic.emqx.client.mqtt.PushCallBack
 import org.markensic.emqx.client.widget.DeleteTextView
 import org.markensic.emqx.models.ConnectBean
 import org.markensic.emqx.models.TopicBean
-import org.markensic.xtls.etc.XTlsFactory
-import org.markensic.xtls.impl.XTls509CertSet
-import org.markensic.xtls.manager.XTlsHostVerifier
+import org.markensic.xtls.XTlsKeyManagerBuilder
+import org.markensic.xtls.XTlsTrustManagerBuilder
+import org.markensic.xtls.etc.Source
+import org.markensic.xtls.hostname.XTlsHostVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
 
@@ -33,6 +34,10 @@ class MessageViewModel : ViewModel() {
   val publishQos = MutableLiveData("")
   val publishMessage = MutableLiveData("")
   val publishRetain = MutableLiveData(false)
+
+  val hostname = XTlsHostVerifier(XTlsHostnameConfigImpl)
+  val trustBuilder = XTlsTrustManagerBuilder(Source.PATH())
+  val keyBuilder = XTlsKeyManagerBuilder(Source.PATH())
 
   fun fillMessage(topic: TopicBean) {
     publishTopic.value = topic.topic
@@ -65,19 +70,20 @@ class MessageViewModel : ViewModel() {
 
   private fun getSSLSocketFactory(bean: ConnectBean, protocol: String = "TLSv1.2"): SSLSocketFactory {
     val sslContext = SSLContext.getInstance(protocol)
-    val trustManager = XTlsFactory.creatManager(
-      XTlsFactory.getCaCertificates(arrayOf(bean.ca)),
-      XTlsHostVerifier(XTls509CertSetImpl)
-    )
+    val trustManager = trustBuilder
+      .addPath(bean.ca)
+      .attachSystemCerts(true)
+      .build(hostname)
     sslContext.init(
       if (bean.twoWayCertification)
-        XTlsFactory.getKeyManagerFactory(
-          XTls509CertSet.ClientKeyPem(
-            bean.clientPem, bean.clientKey
+        keyBuilder
+          .addClientKeyPath(
+            bean.clientPem,
+            bean.clientKey
           )
-        ).keyManagers
-      else
-        null,
+          .build()
+          .keyManagers
+      else null,
       arrayOf(trustManager),
       null
     )
